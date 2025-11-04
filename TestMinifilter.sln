@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36301.6
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestMinifilter", "TestMinifilter\TestMinifilter.vcxproj", "{3ECF3B52-E543-EBB8-C221-F5A78121916E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Minifilter_User", "Minifilter_User\Minifilter_User.vcxproj", "{3FB8E47F-682C-40A6-9530-DA384640AA86}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM64 = Debug|ARM64
+		Debug|x64 = Debug|x64
+		Release|ARM64 = Release|ARM64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3ECF3B52-E543-EBB8-C221-F5A78121916E}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{3ECF3B52-E543-EBB8-C221-F5A78121916E}.Debug|ARM64.Build.0 = Debug|ARM64
+		{3ECF3B52-E543-EBB8-C221-F5A78121916E}.Debug|ARM64.Deploy.0 = Debug|ARM64
+		{3ECF3B52-E543-EBB8-C221-F5A78121916E}.Debug|x64.ActiveCfg = Debug|x64
+		{3ECF3B52-E543-EBB8-C221-F5A78121916E}.Debug|x64.Build.0 = Debug|x64
+		{3ECF3B52-E543-EBB8-C221-F5A78121916E}.Debug|x64.Deploy.0 = Debug|x64
+		{3ECF3B52-E543-EBB8-C221-F5A78121916E}.Release|ARM64.ActiveCfg = Release|ARM64
+		{3ECF3B52-E543-EBB8-C221-F5A78121916E}.Release|ARM64.Build.0 = Release|ARM64
+		{3ECF3B52-E543-EBB8-C221-F5A78121916E}.Release|ARM64.Deploy.0 = Release|ARM64
+		{3ECF3B52-E543-EBB8-C221-F5A78121916E}.Release|x64.ActiveCfg = Release|x64
+		{3ECF3B52-E543-EBB8-C221-F5A78121916E}.Release|x64.Build.0 = Release|x64
+		{3ECF3B52-E543-EBB8-C221-F5A78121916E}.Release|x64.Deploy.0 = Release|x64
+		{3FB8E47F-682C-40A6-9530-DA384640AA86}.Debug|ARM64.ActiveCfg = Debug|x64
+		{3FB8E47F-682C-40A6-9530-DA384640AA86}.Debug|ARM64.Build.0 = Debug|x64
+		{3FB8E47F-682C-40A6-9530-DA384640AA86}.Debug|x64.ActiveCfg = Debug|x64
+		{3FB8E47F-682C-40A6-9530-DA384640AA86}.Debug|x64.Build.0 = Debug|x64
+		{3FB8E47F-682C-40A6-9530-DA384640AA86}.Release|ARM64.ActiveCfg = Release|x64
+		{3FB8E47F-682C-40A6-9530-DA384640AA86}.Release|ARM64.Build.0 = Release|x64
+		{3FB8E47F-682C-40A6-9530-DA384640AA86}.Release|x64.ActiveCfg = Release|x64
+		{3FB8E47F-682C-40A6-9530-DA384640AA86}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {51661D82-A966-45D3-995D-A59DA1B48E22}
+	EndGlobalSection
+EndGlobal
