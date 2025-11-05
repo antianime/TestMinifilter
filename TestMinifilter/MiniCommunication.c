@@ -49,9 +49,21 @@ NTSTATUS MessageCallback(
     case 0:
     {
         struct CommandStruct* command = (struct CommandStruct*)InputBuffer;
+        switch (command->Command)
+        {
+            case Start:
+            FilterSwitch = TRUE;
+            KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Filter Started\n"));
+			break;
+
+            case Stop:
+            FilterSwitch = FALSE;
+			KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Filter Stopped\n"));
+            break;
+        }
     }
         break;
-    default:
+    default:    //message
     {
         struct MessageStruct* message = (struct MessageStruct*)InputBuffer;
         UNICODE_STRING Input = { (USHORT)message->length, (USHORT)InputBufferLength , message->buffer };

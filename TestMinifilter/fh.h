@@ -17,15 +17,16 @@ NTSTATUS AddPath(PUNICODE_STRING FilePath);
 
 NTSTATUS CommunicationSetup();
 
+typedef enum _CommandEnum
+{
+	Start = 1,
+	Stop,
+	ClearAll
+}CommandEnum;
 struct CommandStruct
 {
 	int ZeroSignal;// = 0;
-	enum CommandEnum
-	{
-		Start = 1,
-		Stop = 2,
-		ClearAll = 3
-	};
+	CommandEnum Command;
 	WCHAR buffer[MAX_PATH];
 };
 

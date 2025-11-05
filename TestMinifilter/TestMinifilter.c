@@ -177,7 +177,7 @@ FLT_PREOP_CALLBACK_STATUS nb666(    //预处理，仅放行目录查询相关IRP
     UNREFERENCED_PARAMETER(FltObjects);
 
     PFLT_PARAMETERS Params = &Data->Iopb->Parameters;
-    if (Data->Iopb->MinorFunction != IRP_MN_QUERY_DIRECTORY)
+    if (Data->Iopb->MinorFunction != IRP_MN_QUERY_DIRECTORY || FilterSwitch == FALSE)
         return FLT_PREOP_SUCCESS_NO_CALLBACK;   //直接放行
 
     switch (Params->DirectoryControl.QueryDirectory.FileInformationClass)
