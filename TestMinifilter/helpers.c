@@ -20,6 +20,9 @@ NTSTATUS AddPath(PUNICODE_STRING FilePath)
         }
         RtlStringCbPrintfW(TempBuffer, 64, L"\\??\\%c:", (WCHAR)FilePath->Buffer[0]);
         UNICODE_STRING Temp = { 12, 64, TempBuffer };
+        //Temp.Buffer = TempBuffer;
+        //Temp.MaximumLength = 64;
+        //Temp.Length = 12;//(5+1)*2
         OBJECT_ATTRIBUTES oa;
         InitializeObjectAttributes(&oa, &Temp, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, NULL, NULL);
         HANDLE hLink;
@@ -32,7 +35,7 @@ NTSTATUS AddPath(PUNICODE_STRING FilePath)
             KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, "Open link End\n"));
             return STATUS_SUCCESS;
         }
-        
+
         */
 
         if (!NT_SUCCESS(status))

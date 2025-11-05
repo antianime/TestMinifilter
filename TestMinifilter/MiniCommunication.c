@@ -63,7 +63,7 @@ NTSTATUS MessageCallback(
         }
     }
         break;
-    default:    //message
+    default:
     {
         struct MessageStruct* message = (struct MessageStruct*)InputBuffer;
         UNICODE_STRING Input = { (USHORT)message->length, (USHORT)InputBufferLength , message->buffer };
