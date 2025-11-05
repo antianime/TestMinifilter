@@ -47,7 +47,7 @@ FLT_POSTOP_CALLBACK_STATUS nb666Post(
     UNREFERENCED_PARAMETER(CompletionContext);
     UNREFERENCED_PARAMETER(FltObjects);
 
-    PFLT_FILE_NAME_INFORMATION pInfo;
+    PFLT_FILE_NAME_INFORMATION pInfo;   //获取文件夹
     FltGetFileNameInformation(Data, FLT_FILE_NAME_NORMALIZED | FLT_FILE_NAME_QUERY_DEFAULT, &pInfo);
     FltParseFileNameInformation(pInfo);
 
@@ -56,24 +56,13 @@ FLT_POSTOP_CALLBACK_STATUS nb666Post(
 
     if (RtlCompareMemory(pInfo->Volume.Buffer, ConstantNTHeader.Buffer, ConstantNTHeader.Length) != ConstantNTHeader.Length || ps.SubToDos[ThisNTSub] == 0)//是否属于\\Device\\HarddiskVolume
     {
+        FltReleaseFileNameInformation(pInfo);
         return FLT_POSTOP_FINISHED_PROCESSING;
     }
-    USHORT ThisDosSub = ps.SubToDos[ThisNTSub];
     
 
-    PDosNode pdn = ps.DosList[ThisDosSub].Head;
-    for (; pdn != NULL; pdn = pdn->Next)
-    {
-		USHORT templen = pInfo->Name.Length - pInfo->Volume.Length;
-        UNICODE_STRING Tempstr = { templen, templen + 2, (PWCHAR)((PUCHAR)pInfo->Name.Buffer + pInfo->Volume.Length) };
-        if (templen == pdn->ParentDir.Length && RtlEqualUnicodeString(&Tempstr, &pdn->ParentDir, TRUE))
-            break;
-
-        if (pdn == NULL || pdn->Next == NULL)
-			return FLT_POSTOP_FINISHED_PROCESSING;
-            
-    }
-
+    
+    //获取文件名
     //先获取偏移
     ULONG ulOffset_NextEntryOffset = 0;
     ULONG ulOffset_FileName = 0;
@@ -112,56 +101,85 @@ FLT_POSTOP_CALLBACK_STATUS nb666Post(
     ulOffset_FileName = Destination[2];
     ulOffset_FileNameLen = Destination[3];
 
-
-
-    PVOID Base = Data->Iopb->Parameters.DirectoryControl.QueryDirectory.DirectoryBuffer;
+    PVOID Base;
     ULONG NextEntryOffset;
     PWCHAR FileName;
     ULONG FileNameLen;
     PVOID last = NULL;
 
-    for (;;)
+
+
+    USHORT templen = pInfo->Name.Length - pInfo->Volume.Length;
+    UNICODE_STRING Tempstr = { templen, templen + 2, (PWCHAR)((PUCHAR)pInfo->Name.Buffer + pInfo->Volume.Length) };
+    PDosNode pdn = ps.DosList[ps.SubToDos[ThisNTSub]].Head;
+    for (; pdn != NULL; pdn = pdn->Next)
     {
-        NextEntryOffset = *(ULONG*)((PUCHAR)Base + ulOffset_NextEntryOffset);
+        
+        if (!(templen == pdn->ParentDir.Length && RtlEqualUnicodeString(&Tempstr, &pdn->ParentDir, TRUE)))
+            continue;
 
-        FileName = (PWCHAR)((PUCHAR)Base + ulOffset_FileName);
-        FileNameLen = *(ULONG*)((PUCHAR)Base + ulOffset_FileNameLen);
-        if (FileNameLen == pdn->FileName.Length && RtlCompareMemory(FileName, pdn->FileName.Buffer, FileNameLen) == FileNameLen)
+
+        /*
+        if (pdn == NULL || pdn->Next == NULL)
+            return FLT_POSTOP_FINISHED_PROCESSING;
+        */
+        
+        Base = Data->Iopb->Parameters.DirectoryControl.QueryDirectory.DirectoryBuffer;
+        for (;;)
         {
-            if (last == NULL)   //第一个
+            NextEntryOffset = *(ULONG*)((PUCHAR)Base + ulOffset_NextEntryOffset);
+            FileName = (PWCHAR)((PUCHAR)Base + ulOffset_FileName);
+            FileNameLen = *(ULONG*)((PUCHAR)Base + ulOffset_FileNameLen);
+            if (FileNameLen == pdn->FileName.Length && RtlCompareMemory(FileName, pdn->FileName.Buffer, FileNameLen) == FileNameLen)
             {
-                if (NextEntryOffset == 0) //且最后一个
+                if (last == NULL)   //第一个
                 {
-                    //直接返回
-                    Data->IoStatus.Information = 0;
-                    Data->IoStatus.Status = STATUS_NO_MORE_ENTRIES;
-                }
-                else//不是最后一个
-                {
-                    PVOID Next = (PVOID)((PUCHAR)Base + NextEntryOffset);
-                    ULONG Next_NextEntryOffset = *(ULONG*)((PUCHAR)Next + ulOffset_NextEntryOffset);
-                    RtlMoveMemory(Base, Next, Next_NextEntryOffset);
-                    if (Next_NextEntryOffset != 0);
+                    if (NextEntryOffset == 0) //且最后一个
+                    {
+                        //直接返回
+                        Data->IoStatus.Information = 0;
+                        Data->IoStatus.Status = STATUS_NO_MORE_ENTRIES;
+                    }
+                    else//不是最后一个
+                    {
+                        PVOID Next = (PVOID)((PUCHAR)Base + NextEntryOffset);
+                        ULONG Next_NextEntryOffset = *(ULONG*)((PUCHAR)Next + ulOffset_NextEntryOffset);
+                        RtlMoveMemory(Base, Next, Next_NextEntryOffset);
+                        if (Next_NextEntryOffset != 0);
                         *(ULONG*)((PUCHAR)Base + ulOffset_NextEntryOffset) = NextEntryOffset + Next_NextEntryOffset;
-                }
+                    }
 
+                }
+                else//不是第一个
+                {
+                    if (NextEntryOffset == 0)    //最后一个
+                        *(ULONG*)((PUCHAR)last + ulOffset_NextEntryOffset) = 0;
+                    else
+                        *(ULONG*)((PUCHAR)last + ulOffset_NextEntryOffset) += *(ULONG*)((PUCHAR)Base + ulOffset_NextEntryOffset);
+                }
+                break;
             }
-            else//不是第一个
-            {
-                if (NextEntryOffset == 0)    //最后一个
-                    *(ULONG*)((PUCHAR)last + ulOffset_NextEntryOffset) = 0;
-                else
-                    *(ULONG*)((PUCHAR)last + ulOffset_NextEntryOffset) += *(ULONG*)((PUCHAR)Base + ulOffset_NextEntryOffset);
-            }
-            break;
+
+
+            if (NextEntryOffset == 0)
+                break;
+            last = Base;
+            Base = (PVOID)((PUCHAR)Base + NextEntryOffset);
         }
 
 
-        if (NextEntryOffset == 0)
-            break;
-        last = Base;
-        Base = (PVOID)((PUCHAR)Base + NextEntryOffset);
+
     }
+
+
+
+
+
+
+
+
+
+    
 	FltReleaseFileNameInformation(pInfo);
     return FLT_POSTOP_FINISHED_PROCESSING;
 }
